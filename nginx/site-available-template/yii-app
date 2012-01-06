@@ -1,0 +1,104 @@
+#Implement upstream connection to PHP-FPM
+# "phpfpm" here is a name for this upstream connection, which you can customize
+# I create a custom upstream connection per vhost, to better segregate PHP processes by vhost
+# To do the same, you need a unique upstream name, and a unique filename for your php5-fpm.sock file
+#upstream phpfpm {
+#    server unix:/var/run/php5-fpm.sock;
+#}
+
+server {
+    # Bind to the public IP bound to your domain
+    listen _VHOST_IP_ADDRESS_:80;
+    # Specify this vhost's domain name
+    server_name _VHOST_DOMAIN_NAME_;
+    
+    #Specify the application path
+    root /var/www/_APPLICATION_NAME_/;
+    index index.php;
+
+    # Specify log locations for current site
+    access_log /var/log/nginx/_APPLICATION_NAME_/nginx_access.log;
+    error_log /var/log/nginx/_APPLICATION_NAME_/nginx_error.log warn;
+
+    ## Block bad bots
+    if ($http_user_agent ~* (HTTrack|HTMLParser|libcurl|discobot|Exabot|Casper|kmccrew|plaNETWORK|RPT-HTTPClient)) {
+        return 444;
+    }
+
+    ## Block certain Referers (case insensitive)
+    if ($http_referer ~* (sex|vigra|viagra) ) {
+        return 444;
+    }
+
+    # Disable logging for favicon
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    # Disable logging for robots.txt
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    # Deny all attempts to access hidden files such as .htaccess, .htpasswd, .DS_Store (Mac).
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Block access to protected, framework, and nbproject (artifact from Netbeans)
+    location ~ /(protected|framework|nbproject|0doc) {
+       # deny all;
+        internal;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Block access to theme-folder views directories
+    location ~ /themes/\w+/views {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Attempt the uri, uri+/, then fall back to yii's index.php with args included
+    # Note: old examples use IF statements, which nginx considers evil, this approach is more widely supported
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+
+    # Tell browser to cache image files for 24 hours, do not log missing images
+    # I typically keep this after the yii rules, so that there is no conflict with content served by Yii
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires 24h;
+        log_not_found off;
+    }
+
+
+   ## Use PATH_INFO for translating the requests to the
+   ## FastCGI. This config follows Igor's suggestion here:
+   ## http://forum.nginx.org/read.php?2,124378,124582.
+   ## This is preferable to using:
+   ## fastcgi_split_path_info ^(.+\.php)(.*)$
+   ## It saves one regex in the location. Hence it's faster.
+   location ~ ^(?<script>.+\.php)(?<path_info>.*)$ {
+       include /etc/nginx/fastcgi.conf;
+       ## The fastcgi_params must be redefined from the ones
+       ## given in fastcgi.conf. No longer standard names
+       ## but arbitrary: named patterns in regex.
+       fastcgi_param SCRIPT_FILENAME $document_root$script;
+       fastcgi_param SCRIPT_NAME $script;
+       fastcgi_param PATH_INFO $path_info;
+       ## Passing the request upstream to the FastCGI
+       ## listener.
+       #fastcgi_pass unix:/tmp/php-cgi/php-cgi.socket;
+       fastcgi_pass unix:/var/run/php5-fpm.sock;
+     }
+
+}
+
