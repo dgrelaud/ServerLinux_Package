@@ -5,7 +5,7 @@
 
 What is the content of the package ?
 ------------------------------------
-- PhpMyAdmin 3.4.9 with default password in config.inc.php 
+- PhpMyAdmin 3.4.9 
 - default robots.txt for bots
 - Yii Framework 1.1.9
 - Bash script to install a new Yii application
@@ -19,7 +19,8 @@ apt-get -y install git-core screen
 cd /home
 git clone git://github.com/dgrelaud/ServerLinux_Package.git
 
-- Install PhpMyAdmin and Yii Application (it will copy the www/ directory in /var/www/ of the server and it will create a nginx config file for phpmyadmin)
+- Install PhpMyAdmin and Yii Application (it will copy the www/ directory 
+in /var/www/ of the server and it will create a nginx config file for phpmyadmin)
 sudo ./install.sh
 
 How to use the script which create a new Yii Applictaion ?
