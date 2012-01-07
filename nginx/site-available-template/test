@@ -41,7 +41,6 @@ server {
         allow all;
         log_not_found off;
         access_log off;
-	alias /var/www/default/robots.txt;
     }
 
     # Deny all attempts to access hidden files such as .htaccess, .htpasswd, .DS_Store (Mac).

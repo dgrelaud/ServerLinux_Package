@@ -1,0 +1,47 @@
+##########################################################################
+# Package for installing additionnal software on a Nginx-PHP-MySQL stack #
+# Author: David Grelaud							 #
+##########################################################################
+
+What is the content of the package ?
+------------------------------------
+- PhpMyAdmin 3.4.9 with default password in config.inc.php 
+- default robots.txt for bots
+- Yii Framework 1.1.9
+- Bash script to install a new Yii application
+
+How to use it ?
+---------------
+- Install Git:
+apt-get -y install git-core screen
+
+- Download the git repository
+cd /home
+git clone git://github.com/dgrelaud/ServerLinux_Package.git
+
+- Install PhpMyAdmin and Yii Application (it will copy the www/ directory in /var/www/ of the server and it will create a nginx config file for phpmyadmin)
+sudo ./install.sh
+
+How to use the script which create a new Yii Applictaion ?
+----------------------------------------------------------
+Execute the bash script createNewApp 
+
+
+Requirements ?
+---------------
+Ubuntu 11.10 tested
+
+
+What the script 'createNewApp' does ?
+-------------------------------------
+
+- It adds an Nginx's description file for each new created site in :
+/etc/nginx/sites-available/@vHostName@
+/etc/nginx/sites-enabled/@vHostName@
+
+- It creates an empty directory in (like phpmyadmin) :
+/var/www/@ApplicationName@
+
+- It creates a log directory for each new application in : 
+/var/log/nginx/@ApplicationName@
+
