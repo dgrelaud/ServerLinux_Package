@@ -6,6 +6,10 @@
 #                                                                       
 #***********************************************************************#
 
+echo "----- Modify /etc/php5/php.ini to set timezone ----- ";
+cp /etc/php5/php.ini /etc/php5/php.ini.backup
+sed -i "s/;date.timezone =/date.timezone = Europe\/Paris/g" /etc/php5/php.ini 
+
 echo "----- Enter the parameters ------";
 ### get IP address and the name of the application ####
 echo "What is the IP of this server (ex. : 198.54.14.54) ?"
